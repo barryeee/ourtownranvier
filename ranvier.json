@@ -1,7 +1,7 @@
 {
   "port": 4000,
   "bundles": [
-    "bundle-example-areas",
+	"bundle-ourtown",
     "bundle-example-channels",
     "bundle-example-classes",
     "bundle-example-combat",
@@ -90,7 +90,7 @@
   "minPlayerNameLength": 3,
   "maxCharacters": 3,
   "reportToAdmins": false,
-  "startingRoom": "limbo:white",
+  "startingRoom": "streets:townsquare",
   "moveCommand": "move",
   "skillLag": 2000,
   "defaultMaxPlayerInventory": 16,

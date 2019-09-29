@@ -1,0 +1,4 @@
+title: "Streets"
+behaviors:
+  progressive-respawn:
+    interval: 20
