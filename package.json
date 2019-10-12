@@ -29,5 +29,12 @@
   },
   "devDependencies": {
     "git-url-parse": "^11.1.2"
-  }
+  },
+  "description": "",
+  "bugs": {
+    "url": "https://github.com/shawncplus/ranviermud/issues"
+  },
+  "homepage": "https://github.com/shawncplus/ranviermud#readme",
+  "main": "index.js",
+  "author": ""
 }
