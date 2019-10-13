@@ -1,0 +1,1963 @@
+From fc70945b7866eca7ca11b95ac9e50fc93a409ac0 Mon Sep 17 00:00:00 2001
+From: barryeee <barryeichelberger@gmail.com>
+Date: Sun, 22 Sep 2019 21:50:03 -0500
+Subject: create pit of despair. Signed-off-by: barryeee
+ <barryeichelberger@gmail.com>
+
+
+diff --git a/bundles/ourtown-areas/.gitignore b/bundles/ourtown-areas/.gitignore
+new file mode 100644
+index 0000000..3c3629e
+--- /dev/null
++++ b/bundles/ourtown-areas/.gitignore
+@@ -0,0 +1 @@
++node_modules
+diff --git a/bundles/ourtown-areas/README.md b/bundles/ourtown-areas/README.md
+new file mode 100644
+index 0000000..3d9f70a
+--- /dev/null
++++ b/bundles/ourtown-areas/README.md
+@@ -0,0 +1 @@
++Example Ranvier bundle with both a coordinate area and a standard area. There are example npcs, items, and quests as well as examples of scripting
+diff --git a/bundles/ourtown-areas/areas/limbo/items.yml b/bundles/ourtown-areas/areas/limbo/items.yml
+new file mode 100644
+index 0000000..4136b6a
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/items.yml
+@@ -0,0 +1,179 @@
++- id: "rustysword"
++  name: "Rusty Sword"
++  type: WEAPON
++  roomDesc: "Rusted Sword"
++  keywords: [ "sword", "rusty", "metal", "rusted" ]
++  description: "An arm's-length, jagged metal sword discolored with red corrosion. The worn leather grip barely held on by fraying thread."
++  metadata:
++    level: 1
++    slot: 'wield'
++    itemLevel: 1
++    quality: common
++    minDamage: 7
++    maxDamage: 15
++    speed: 2.8
++    stats:
++      critical: 1
++- id: "sliceofcheese"
++  name: "Slice of Cheese"
++  roomDesc: "A moldy slice of cheese"
++  keywords: [ "slice", "cheese", "moldy" ]
++  description: "A yellow, slightly moldy slice of cheese. Only a rat could find this appetizing."
++  behaviors:
++    decay:
++      duration: 240
++- id: "woodenchest"
++  type: CONTAINER
++  name: "Wooden Chest"
++  roomDesc: "A wooden chest rests in the corner, its hinges badly rusted."
++  keywords: [ "wooden", "chest" ]
++  description: "Time has not been kind to this chest. It seems to be held together solely by the dirt and rust."
++  items: [ "limbo:rustysword", "limbo:leathervest", "limbo:potionhealth1", "limbo:potionstrength1" ]
++  closed: true
++  maxItems: 5
++  metadata:
++    noPickup: true
++- id: "scraps"
++  name: "Scraps"
++  quality: poor
++  roomDesc: "Scraps from a Training Dummy"
++  keywords: [ "dummy", "scraps" ]
++  description: "Splintered, shattered, and generally destroyed remains of a training dummy"
++  metadata:
++    sellable:
++      value: 5
++      currency: gold
++- id: trainingsword
++  name: "Training Sword"
++  type: WEAPON
++  roomDesc: "Training Sword"
++  keywords: ["sword", "training", "iron"]
++  description: "A hefty iron blade. Not the sharpest sword in the world but it will get the job done."
++  metadata:
++    quality: rare
++    slot: "wield"
++    itemLevel: 10
++    level: 5
++    minDamage: 11
++    maxDamage: 20
++    speed: 2.8
++    stats:
++      strength: 2
++      stamina: 2
++      critical: -1
++    sellable:
++      value: 30
++      currency: gold
++- id: leathervest
++  name: "Leather Vest"
++  type: ARMOR
++  roomDesc: "Leather Vest"
++  keywords: ["leather", "vest"]
++  description: "A plain leather vest. Better than nothing."
++  metadata:
++    quality: common
++    slot: "chest"
++    level: 1
++    itemLevel: 1
++    stats:
++      armor: 20
++    sellable:
++      value: 30
++      currency: gold
++- id: potionhealth1
++  name: "Potion of Health I"
++  roomDesc: "Potion of Health I"
++  keywords: [ "potion", "health" ]
++  type: POTION
++  metadata:
++    level: 1
++    # usable has two variants: spell, and effect
++    usable:
++      # this is the spell variant, you specify a skill of type SPELL
++      spell: "potion"
++      # charges/destroyOnDepleted lets you create consumable items
++      # without specifying charges the item can be used forever
++      charges: 5
++      destroyOnDepleted: true
++      # cooldown before item can be used again
++      cooldown: 30
++      # spell configuration, spell can access it via this.options
++      options:
++        restores: 30
++        stat: "health"
++- id: potionstrength1
++  name: "Potion of Strength I"
++  roomDesc: "Potion of Strength I"
++  keywords: [ "potion", "strength" ]
++  type: POTION
++  metadata:
++    level: 1
++    usable:
++      # this is the effect variant, you specify an effect name instead of a spell
++      effect: "potion.buff"
++      charges: 2
++      destroyOnDepleted: true
++      # effect config, see Effect docs. `name` is auto-populated with the item name
++      config:
++        description: "Increases strength by <b>10</b> for <b>15</b> seconds"
++        duration: 15000
++      # effect state, see Effect docs
++      state:
++        magnitude: 10
++        stat: "strength"
++- id: bladeofranvier
++  name: "Blade of Ranvier"
++  type: WEAPON
++  roomDesc: "Blade of Ranvier"
++  keywords: ["sword", "blade", "ranvier"]
++  description: "The blade shines a brilliant silver. Holding it you feel as if you could take on the world."
++  script: "ranvier-blade"
++  metadata:
++    quality: epic
++    slot: "wield"
++    itemLevel: 15
++    level: 10
++    minDamage: 13
++    maxDamage: 26
++    speed: 2.8
++    specialEffects:
++      - "Chance on hit: Blade of Ranvier thirsts for blood and heals the wielder for 25% of damage done."
++    stats:
++      strength: 2
++      stamina: 2
++      critical: 3
++- id: woodenshield
++  name: "Wooden Shield"
++  type: ARMOR
++  roomDesc: "Wooden Shield"
++  keywords: ["shield", "wooden"]
++  description: "A rather uninteresting looking wooden shield. A rusted metal band barely hold its together and the leather arm band is nearly torn."
++  metadata:
++    quality: common
++    slot: "shield"
++    level: 1
++    itemLevel: 1
++    stats:
++      armor: 10
++    sellable:
++      value: 30
++      currency: gold
++- id: test_key
++  name: "Oddly-shaped Key"
++  keywords: ["key", "odd", "oddly", "shaped"]
++  roomDesc: "A strange looking key"
++  description: "This key seems overly complex with numerous grooves."
++  metadata:
++    quality: common
++- id: locked_chest
++  type: CONTAINER
++  name: "Locked Chest"
++  roomDesc: "A wooden chest rests open in the corner, its hinges badly rusted."
++  keywords: [ "locked", "wooden", "chest" ]
++  items: [ "limbo:rustysword" ]
++  closed: true
++  locked: true
++  lockedBy: "limbo:test_key"
++  maxItems: 5
++  metadata:
++    noPickup: true
+diff --git a/bundles/ourtown-areas/areas/limbo/loot-pools.yml b/bundles/ourtown-areas/areas/limbo/loot-pools.yml
+new file mode 100644
+index 0000000..a4302b9
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/loot-pools.yml
+@@ -0,0 +1,6 @@
++---
++potions:
++  - "limbo:potionhealth1": 10
++  - "limbo:potionstrength1": 5
++junk:
++  - "limbo:scraps": 50
+diff --git a/bundles/ourtown-areas/areas/limbo/manifest.yml b/bundles/ourtown-areas/areas/limbo/manifest.yml
+new file mode 100644
+index 0000000..101d0fe
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/manifest.yml
+@@ -0,0 +1,4 @@
++title: "Limbo"
++behaviors:
++  progressive-respawn:
++    interval: 20
+diff --git a/bundles/ourtown-areas/areas/limbo/npcs.yml b/bundles/ourtown-areas/areas/limbo/npcs.yml
+new file mode 100644
+index 0000000..42b68c6
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/npcs.yml
+@@ -0,0 +1,135 @@
++- id: rat
++  keywords: ['rat']
++  name: A Rat
++  level: 2
++  description: "The rat's beady red eyes dart frantically, its mouth foaming as it scampers about."
++  script: 'rat'
++  items: ['limbo:sliceofcheese']
++  quests: ['limbo:onecheeseplease']
++  behaviors:
++    combat: true
++    ranvier-wander:
++      interval: 20
++      restrictTo: ['limbo:white', 'limbo:black', 'limbo:training1']
++  attributes:
++    health: 100
++    energy: 100
++- id: wiseoldman
++  keywords: ["wise", "old", "man"]
++  name: "Wise Old Man"
++  level: 99
++  script: 'old-man'
++  description: "A wise looking old man sits on the ground with legs crossed."
++- id: puppy
++  keywords: ["puppy", "dog", "loyal", "wide", "eyed", "wide-eyed"]
++  name: A Puppy
++  description: "A wide-eyed puppy stares up at you."
++  level: 1
++  script: 'puppy'
++- id: trainingdummy
++  keywords: ["dummy", "target", "practice"]
++  level: 2
++  name: "Training Dummy"
++  attributes:
++    health: 100
++    strength: 10
++  behaviors:
++    combat: true
++    lootable:
++      # currencies is a list of currencies this npc can possibly drop and the amount range
++      # the currency key is arbitrary so if you want a new currency just add a new key
++      # the key must be formatted_like_this though, for rendering/saving purposes
++      currencies:
++        gold:
++          min: 10
++          max: 20
++      # pools is a list of either a `"itemEntityReference": dropChance` or a name of a loot pool entry
++      # defined in the loot-pools.yml. This lets you do things like having a 'global' loot pool that every
++      # npc in the area can drop
++      pools:
++        - "limbo:junk"
++        - "limbo:potions"
++        - "limbo:sliceofcheese": 25
++  description: >-
++    The training dummy is almost human shaped although slightly out of proportion. The material it's made of is hard to
++    discern; it seems to constantly change between metal, wood, cloth, and glass depending on the angle. There is a
++    large red and white bullseye painted on its chest. The dummy has no eyes and mindlessly meanders about the area.
++- id: bossdummy
++  keywords: ["boss", "target", "dummy", "practice"]
++  name: "Boss Training Dummy"
++  level: 5
++  description: >-
++    This dummy is significantly larger than the others. Bright red with a monstrous figure it lumbers around the area
++    with a great echoing stomp. Where the other target dummies have a bullseye this dummy has a yellow exclamation mark.
++  attributes:
++    health: 200
++    strength: 15
++  behaviors:
++    combat: true
++    lootable:
++      currencies:
++        gold:
++          min: 50
++          max: 100
++      pools:
++        - "limbo:potions"
++        - "limbo:trainingsword": 100
++        - "limbo:bladeofranvier": 5
++- id: wallythewonderful
++  keywords: ["wally", "wonderful", "shop", "vendor"]
++  name: "Wally the Wonderful"
++  description: >-
++    Moe's Shop has the best wares in town! Armor, weapons and potions, you name and we ... might have it!
++  level: 99
++  metadata:
++    vendor:
++      items:
++        "limbo:trainingsword":
++          cost: 30
++          currency: gold
++        "limbo:leathervest":
++          cost: 30
++          currency: gold
++        "limbo:woodenshield":
++          cost: 30
++          currency: gold
++        "limbo:potionhealth1":
++          cost: 100
++          currency: gold
++        "limbo:potionstrength1":
++          cost: 150
++          currency: gold
++        "limbo:bladeofranvier":
++          cost: 99999
++          currency: gold
++      enterMessage: "Step right up! Get your wares at Moe's Shop!"
++      leaveMessage: "Come back soon!"
++- id: aggro-player-test
++  keywords: ["test", "aggro", "dummy"]
++  level: 2
++  name: "Player-aggressive Training Dummy"
++  description: >-
++    This NPC is aggressive towards players but not other NPCs. Be careful.
++  attributes:
++    health: 120
++    strength: 12
++  behaviors:
++    combat: true
++    ranvier-aggro:
++      delay: 5
++- id: aggro-npc-test
++  keywords: ["test", "aggro", "dummy"]
++  level: 2
++  name: "Self-hating Training Dummy"
++  description: >-
++    This NPC is aggressive towards other NPCs but not to the player.
++  attributes:
++    health: 100
++    strength: 15
++  behaviors:
++    combat: true
++    ranvier-aggro:
++      delay: 5
++      towards:
++        players: false
++        npcs: ["limbo:aggro-npc-test"]
+diff --git a/bundles/ourtown-areas/areas/limbo/quests.yml b/bundles/ourtown-areas/areas/limbo/quests.yml
+new file mode 100644
+index 0000000..4830846
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/quests.yml
+@@ -0,0 +1,86 @@
++---
++- id: journeybegins
++  title: "A Journey Begins"
++  level: 1
++  autoComplete: true
++  description: |-
++    A voice whispers to you: Welcome to the world, young one. This is a dangerous and deadly place, you should arm yourself.
++     - Open the chest with '<white>open chest</white>'
++     - Use '<white>get sword chest</white>' and '<white>get vest chest</white>' to get some gear
++     - Equip it using '<white>wield sword</white>' and '<white>wear vest</white>'
++  completionMessage: |-
++    <b><cyan>Hint: You can use the '<white>tnl</white>' or '<white>level</white>' commands to see how much experience you need to level.</cyan></b>
++    <b><yellow>The rat looks like it is hungry, use '<white>quest list rat</white>' to see what aid you can offer. Use '<white>quest start rat 1</white>' to accept their task.</yellow></b>
++    <b><cyan>Hint: To move around the game type any of the exit names listed in <white>[Exits: ...]</white> when you use the '<white>look</white>' command.</cyan></b>
++  goals:
++    - type: FetchGoal
++      config:
++        title: Find a Weapon
++        count: 1
++        item: 'limbo:rustysword'
++    - type: FetchGoal
++      config:
++        title: Find Some Armor
++        count: 1
++        item: 'limbo:leathervest'
++    - type: EquipGoal
++      config:
++        title: Wield A Weapon
++        slot: wield
++    - type: EquipGoal
++      config:
++        title: Equip Some Armor
++        slot: chest
++  rewards:
++    - type: ExperienceReward
++      config:
++        amount: 5
++        leveledTo: QUEST
++    - type: CurrencyReward
++      config:
++        currency: gold
++        amount: 10
++- id: onecheeseplease
++  title: One Cheese Please
++  level: 1
++  repeatable: true
++  description: |-
++    A rat's squeaks seem to indicate it wants some cheese. You check around the area, maybe someone has left some lying around.
++    
++    Once you find some bring it back to the rat, use '<white>quest log</white>' to find the quest number, then complete the quest with '<white>quest complete #</white>'
++  completionMessage: |-
++    <b><cyan>Hint: NPCs with quests available have <white>[</white><yellow>!</yellow><white>]</white> in front of their name, <white>[</white><yellow>?</yellow><white>]</white> means you have a quest ready to turn in, and <white>[</white><yellow>%</yellow><white>]</white> means you have a quest in progress.</cyan>
++  goals:
++    - type: FetchGoal
++      config:
++        title: Found Cheese
++        count: 1
++        item: 'limbo:sliceofcheese'
++        removeItem: true
++  rewards:
++    - type: ExperienceReward
++      config:
++        amount: 3
++        leveledTo: QUEST
++- id: selfdefense101
++  title: Self Defense 101
++  level: 2
++  requires: [ 'limbo:journeybegins' ]
++  autoComplete: true
++  description: |-
++    A voice whispers to you: It would be wise to practice protecting yourself. There are a number of training dummies in this area that, while not pushovers, will not be too difficult.
++    - Use '<white>attack dummy</white>' to start combat against the training dummy
++    - Once it's dead any loot it drops will be in its corpse on the ground. You can use '<white>look in corpse</white>' to check again or '<white>loot corpse</white>' to retrieve all your loot.
++  completionMessage: |-
++    <b><cyan>Hint: You can get the loot from enemies with '<white>get <item> corpse</white>' but be quick about it, the corpse will decay after some time.</cyan>
++  goals:
++    - type: KillGoal
++      config:
++        title: Kill a Training Dummy
++        npc: 'limbo:trainingdummy'
++        count: 1
++  rewards:
++    - type: ExperienceReward
++      config:
++        amount: 5
++        leveledTo: QUEST
+diff --git a/bundles/ourtown-areas/areas/limbo/rooms.yml b/bundles/ourtown-areas/areas/limbo/rooms.yml
+new file mode 100644
+index 0000000..4f84689
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/rooms.yml
+@@ -0,0 +1,170 @@
++- id: white
++  title: "White Room"
++  description: "A featureless white room. A pitch black void in the shape of archway can be seen on the east side of the room."
++  npcs: ["limbo:rat" ]
++  items:
++    - id: "limbo:woodenchest"
++      respawnChance: 20
++      replaceOnRespawn: true # when this chest respawns completely replace it so its contents get refreshed
++  script: "white"
++  exits:
++    - roomId: "limbo:black"
++      direction: east
++      leaveMessage: " steps into the void and disappears."
++    - roomId: "limbo:ancientwayshrine"
++      direction: down
++    - roomId: "limbo:wallys"
++      direction: west
++    - roomId: "mapped:start"
++      direction: north
++- id: black
++  title: "Black Room"
++  description: >-
++    A completely black room. Somehow all of the light that should be coming from the room to the west does not pass
++    through the archway. A single lightbulb hangs from the ceiling illuminating a small area. To the east you see a
++    large white dome. There is a sign above the entrance to the dome: "Training Area"
++  script: "black"
++  items:
++    - id: "limbo:sliceofcheese"
++      respawnChance: 10
++  npcs: ["limbo:wiseoldman", "limbo:puppy"]
++  exits:
++    - roomId: "limbo:white"
++      direction: west
++      leaveMessage: " steps into the light and disappears."
++    - roomId: "limbo:training1"
++      direction: east
++- &trainingroom
++  id: training1
++  title: "Training Room"
++  script: "combat-training"
++  description: >-
++    The entire area is covered by a large dome with a hexagonal grid surface. A beautiful blue sky reaches from horizon
++    to horizon, punctuated by the lines of the grid. The dome shimmers as virtual birds fly into and out of its surface.
++    The pure green grass is eerily undisturbed by you walking over it or by the simulated breeze.
++  npcs:
++    - id: "limbo:trainingdummy"
++      respawnChance: 25
++      maxLoad: 3
++  exits:
++    - roomId: "limbo:black"
++      direction: west
++    - roomId: "limbo:training2"
++      direction: north
++    - roomId: "limbo:training4"
++      direction: east
++- <<: *trainingroom
++  id: training2
++  title: "Training Room 2"
++  items:
++    - id: "craft:greenplant"
++      respawnChance: 30
++  npcs:
++    - id: "limbo:trainingdummy"
++      respawnChance: 25
++      maxLoad: 3
++    - id: "limbo:aggro-player-test"
++      respawnChance: 25
++      maxLoad: 1
++  exits:
++    - roomId: "limbo:training1"
++      direction: south
++    - roomId: "limbo:training3"
++      direction: east
++- <<: *trainingroom
++  id: training3
++  title: "Training Room 3"
++  items:
++    - id: "craft:redrose"
++      respawnChance: 15
++  exits:
++    - roomId: "limbo:training2"
++      direction: west
++    - roomId: "limbo:training4"
++      direction: south
++    - roomId: "limbo:bosstraining"
++      direction: north
++- <<: *trainingroom
++  id: training4
++  title: "Training Room 4"
++  npcs:
++    - id: "limbo:trainingdummy"
++      respawnChance: 25
++      maxLoad: 3
++    - id: "limbo:aggro-npc-test"
++      respawnChance: 50
++      maxLoad: 2
++  exits:
++    - roomId: "limbo:training1"
++      direction: west
++    - roomId: "limbo:training3"
++      direction: north
++- id: bosstraining
++  title: "Boss Training Room"
++  description: >-
++    The dome in this section is bright red, the pure green grass is replaced with a smooth white surface. The ground
++    beneath your feet has the word "Danger" in bright red letters tiled across the area.
++  npcs:
++    - id: "limbo:bossdummy"
++      respawnChance: 50
++  exits:
++    - roomId: "limbo:training3"
++      direction: south
++- id: ancientwayshrine
++  title: "Ancient Wayshrine"
++  description: >
++    A runed black obelisk towers in the center of this clearing, surrounded by a faerie ring. The runes pulse and glow with
++    a soft blue light. The grass immediately around the obelisk is immaculate in stark contrast to the dying former meadow
++    that makes up the clearing.
++  script: 'ancientwayshrine'
++  exits:
++    - roomId: "limbo:white"
++      direction: up
++    - roomId: "limbo:context"
++      direction: down
++- id: wallys
++  title: "Wally's Wonderful Wares (Shop)"
++  description: >- 
++    A very brightly colored shop stall stands in the middle of an otherwise desolate clearing. The stall is covered in
++    colorful cloth, shining gems, and battle gear of all varieties. A large sign sits next to the products:
++    "<b><yellow>Wally's Wonderful Wares</yellow></b> has the best products in town! Armor, weapons and potions, you name
++    and we... might have it!"
++  npcs:
++    - id: "limbo:wallythewonderful"
++      respawnChance: 0
++  exits:
++    - roomId: "limbo:white"
++      direction: east
++- id: context
++  title: "Room Context Commands Test"
++  script: 'context'
++  description: >-
++    This room shows off commands that are only active in a particular room. Try out the <b><cyan>roomtest</cyan></b> command.
++  metadata:
++    commands: [ 'roomtest' ]
++  items:
++    - id: "limbo:test_key"
++  exits:
++    - roomId: "limbo:ancientwayshrine"
++      direction: up
++    - roomId: "limbo:locked"
++      direction: east
++  doors:
++    "limbo:ancientwayshrine":
++      locked: true
++      closed: true
++- id: locked
++  title: "Locked room with key"
++  description: This room requires a key to get into
++  items:
++    - id: "limbo:locked_chest"
++      respawnChance: 5
++      replaceOnRespawn: true
++  exits:
++    - roomId: "limbo:context"
++      direction: west
++  doors:
++    "limbo:context":
++      lockedBy: "limbo:test_key"
++      locked: true
++      closed: true
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/items/ranvier-blade.js b/bundles/ourtown-areas/areas/limbo/scripts/items/ranvier-blade.js
+new file mode 100644
+index 0000000..bcc51f6
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/items/ranvier-blade.js
+@@ -0,0 +1,34 @@
++'use strict';
++
++const { Random } = require('rando-js');
++
++const { Broadcast, Heal } = require('ranvier');
++
++/**
++ * Example weapon hit script
++ */
++module.exports = {
++  listeners: {
++    hit: state => function (damage, target, finalAmount) {
++      if (!damage.attacker || damage.attacker.isNpc) {
++        return;
++      }
++
++      // Have to be careful in weapon scripts. If you have a weapon script that causes damage and
++      // it listens for the 'hit' event you will have to check to make sure that `damage.source
++      // !== this` otherwise you could create an infinite loop the weapon's own damage triggering
++      // its script
++
++      if (Random.probability(50)) {
++        const amount = damage.metadata.critical ?
++          damage.attacker.getMaxAttribute('health') :
++          Math.floor(finalAmount / 4);
++
++        const heal = new Heal('health', amount, damage.attacker, this);
++
++        Broadcast.sayAt(damage.attacker, `<b><white>The Blade of Ranvier shines with a bright white light and you see wisps of ${target.name}'s soul flow into the blade.</white></b>`, 80);
++        heal.commit(damage.attacker);
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/npcs/old-man.js b/bundles/ourtown-areas/areas/limbo/scripts/npcs/old-man.js
+new file mode 100644
+index 0000000..7ef5a1b
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/npcs/old-man.js
+@@ -0,0 +1,30 @@
++'use strict';
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      if (this.hasEffectType('speaking')) {
++        return;
++      }
++
++      const speak = state.EffectFactory.create('speak', {}, {
++        messageList: [
++          "Welcome, %player%. The combat training area lies to the east.",
++          "To the west lies Wally's shop where you can stock up on potions.",
++        ],
++        outputFn: message => {
++          message = message.replace(/%player%/, player.name);
++          state.ChannelManager.get('say').send(state, this, message);
++        }
++      });
++      this.addEffect(speak);
++    },
++
++    playerLeave: state => function (player) {
++      const speaking = this.effects.getByType('speaking');
++      if (speaking) {
++        speaking.remove();
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/npcs/puppy.js b/bundles/ourtown-areas/areas/limbo/scripts/npcs/puppy.js
+new file mode 100644
+index 0000000..2d36841
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/npcs/puppy.js
+@@ -0,0 +1,16 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      if (this.following) {
++        return;
++      }
++
++      Broadcast.sayAt(player, 'The puppy lets out a happy bark and runs to your side.');
++      this.follow(player);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/npcs/rat.js b/bundles/ourtown-areas/areas/limbo/scripts/npcs/rat.js
+new file mode 100644
+index 0000000..714c49d
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/npcs/rat.js
+@@ -0,0 +1,35 @@
++'use strict';
++
++const { Broadcast, Logger } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    spawn: state => function () {
++      Broadcast.sayAt(this.room, "A rat scurries into view.");
++      Logger.log(`Spawned rat into Room [${this.room.title}]`);
++    },
++
++    /**
++     * Rat tries to use Rend every time it's available
++     */
++    updateTick: state => function () {
++      if (!this.isInCombat()) {
++        return;
++      }
++
++      const target = [...this.combatants][0];
++
++      const rend = state.SkillManager.get('rend');
++      // skills do both of these checks internally but I only want to send
++      // this message when execute would definitely succeed
++      if (!rend.onCooldown(this) && rend.hasEnoughResources(this)) {
++        Broadcast.sayAt(target, "The rat bears its fangs and leaps at your throat!");
++        rend.execute(null, this, target);
++      }
++    },
++
++    deathblow: state => function (player) {
++      Broadcast.sayAt(player.room, `The rat seems to snicker evilly as ${player.name} drops dead from their wounds.`);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/rooms/ancientwayshrine.js b/bundles/ourtown-areas/areas/limbo/scripts/rooms/ancientwayshrine.js
+new file mode 100644
+index 0000000..cf0df1c
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/rooms/ancientwayshrine.js
+@@ -0,0 +1,24 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    channelReceive: state => function (channel, sender, message) {
++      if (channel.name !== 'say') {
++        return;
++      }
++
++      if (!message.toLowerCase().match('mellon')) {
++        return;
++      }
++
++      const downExit = this.getExits().find(exit => exit.direction === 'down');
++      const downRoom = state.RoomManager.getRoom(downExit.roomId);
++
++      Broadcast.sayAt(sender, "You have spoken 'friend', you may enter. The trap door opens with a *click*");
++      downRoom.unlockDoor(this);
++      downRoom.openDoor(this);
++    },
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/rooms/black.js b/bundles/ourtown-areas/areas/limbo/scripts/rooms/black.js
+new file mode 100644
+index 0000000..8831385
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/rooms/black.js
+@@ -0,0 +1,12 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      Broadcast.sayAt(player);
++      Broadcast.sayAt(player, `<b><cyan>Hint: You can pick up items from the room listed in '<white>look</white>' with '<white>get</white>' followed by a reasonable keyword for the item e.g., '<white>get cheese</white>'. Some items, like the chest, may contain items; you can check by looking at the item.</cyan></b>`, 80);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/rooms/combat-training.js b/bundles/ourtown-areas/areas/limbo/scripts/rooms/combat-training.js
+new file mode 100644
+index 0000000..5a4ba6e
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/rooms/combat-training.js
+@@ -0,0 +1,13 @@
++'use strict';
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      const questRef = 'limbo:selfdefense101';
++      if (state.QuestFactory.canStart(player, questRef)) {
++        const quest = state.QuestFactory.create(state, questRef, player);
++        player.questTracker.start(quest);
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/rooms/context.js b/bundles/ourtown-areas/areas/limbo/scripts/rooms/context.js
+new file mode 100644
+index 0000000..17a881e
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/rooms/context.js
+@@ -0,0 +1,11 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    command: state => function (player, commandName, args) {
++      Broadcast.sayAt(player, `You just executed room context command '${commandName}' with arguments ${args}`);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/limbo/scripts/rooms/white.js b/bundles/ourtown-areas/areas/limbo/scripts/rooms/white.js
+new file mode 100644
+index 0000000..a9bd723
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/limbo/scripts/rooms/white.js
+@@ -0,0 +1,13 @@
++'use strict';
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      const questRef = 'limbo:journeybegins';
++      if (state.QuestFactory.canStart(player, questRef)) {
++        const quest = state.QuestFactory.create(state, questRef, player);
++        player.questTracker.start(quest);
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/mapped/manifest.yml b/bundles/ourtown-areas/areas/mapped/manifest.yml
+new file mode 100644
+index 0000000..1ab38fd
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/mapped/manifest.yml
+@@ -0,0 +1,4 @@
++---
++title: Map Test
++info:
++  respawnInterval: 60
+diff --git a/bundles/ourtown-areas/areas/mapped/npcs.yml b/bundles/ourtown-areas/areas/mapped/npcs.yml
+new file mode 100644
+index 0000000..ec81770
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/mapped/npcs.yml
+@@ -0,0 +1,10 @@
++---
++- id: squirrel
++  keywords: ['squirrel']
++  name: A Squirrel
++  level: 2
++  description: "A furry little squirrel"
++  behaviors:
++    ranvier-wander:
++      interval: 30
++      areaRestricted: true
+diff --git a/bundles/ourtown-areas/areas/mapped/rooms.yml b/bundles/ourtown-areas/areas/mapped/rooms.yml
+new file mode 100644
+index 0000000..d609342
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/mapped/rooms.yml
+@@ -0,0 +1,52 @@
++---
++- id: start
++  title: Begin
++  coordinates: [0, 0, 0]
++  description: "You are in the start of this area. There are hallways to the north and south."
++  npcs: [mapped:squirrel]
++
++- id: hallway-north-1
++  title: Hallway North 1
++  coordinates: [0, 1, 0]
++  description: "You are in the north hallway."
++- id: hallway-north-2
++  title: Hallway North 2
++  coordinates: [0, 2, 0]
++  description: "You are in the north hallway."
++- id: basement-north
++  title: Basement
++  coordinates: [0, 2, -1]
++  description: "You are in the basement."
++  doors:
++    "mapped:hallway-north-2":
++      closed: true
++
++- id: hallway-south-1
++  title: Hallway South 1
++  coordinates: [0, -1, 0]
++  description: "You are in the south hallway."
++- id: hallway-south-2
++  title: Hallway South 2
++  coordinates: [0, -2, 0]
++  description: "You are in the south hallway."
++- id: attic-south
++  title: Attic
++  coordinates: [0, -2, 1]
++  description: "You are in the attic."
++  # explicitly defined exit to leave the area
++  exits:
++    - direction: east
++      roomId: "limbo:white"
++
++- id: hallway-east-1
++  title: Hallway East 1
++  coordinates: [1, 0, 0]
++  description: "You are in the east hallway."
++- id: hallway-east-2
++  title: Hallway East 2
++  coordinates: [2, 0, 0]
++  description: "You are in the east hallway."
++- id: hallway-east-3
++  title: Hallway East 3
++  coordinates: [2, -1, 0]
++  description: "You are in the east hallway."
+diff --git a/bundles/ourtown-areas/areas/townhall/items.yml b/bundles/ourtown-areas/areas/townhall/items.yml
+new file mode 100644
+index 0000000..77fcaab
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/items.yml
+@@ -0,0 +1,184 @@
++- id: "goldrock"
++  name: "Gold Rock"
++  roomDesc: "a gold rock"
++  keywords: [ "gold rock", "gold", "rock" ]
++  description: "A small rock with a golden sheen to it. It may or may not be gold, but it could be used as a weapon in a pinch."
++- id: "rustysword"
++  name: "Rusty Sword"
++  type: WEAPON
++  roomDesc: "Rusted Sword"
++  keywords: [ "sword", "rusty", "metal", "rusted" ]
++  description: "An arm's-length, jagged metal sword discolored with red corrosion. The worn leather grip barely held on by fraying thread."
++  metadata:
++    level: 1
++    slot: 'wield'
++    itemLevel: 1
++    quality: common
++    minDamage: 7
++    maxDamage: 15
++    speed: 2.8
++    stats:
++      critical: 1
++- id: "sliceofcheese"
++  name: "Slice of Cheese"
++  roomDesc: "A moldy slice of cheese"
++  keywords: [ "slice", "cheese", "moldy" ]
++  description: "A yellow, slightly moldy slice of cheese. Only a rat could find this appetizing."
++  behaviors:
++    decay:
++      duration: 240
++- id: "woodenchest"
++  type: CONTAINER
++  name: "Wooden Chest"
++  roomDesc: "A wooden chest rests in the corner, its hinges badly rusted."
++  keywords: [ "wooden", "chest" ]
++  description: "Time has not been kind to this chest. It seems to be held together solely by the dirt and rust."
++  items: [ "limbo:rustysword", "limbo:leathervest", "limbo:potionhealth1", "limbo:potionstrength1" ]
++  closed: true
++  maxItems: 5
++  metadata:
++    noPickup: true
++- id: "scraps"
++  name: "Scraps"
++  quality: poor
++  roomDesc: "Scraps from a Training Dummy"
++  keywords: [ "dummy", "scraps" ]
++  description: "Splintered, shattered, and generally destroyed remains of a training dummy"
++  metadata:
++    sellable:
++      value: 5
++      currency: gold
++- id: trainingsword
++  name: "Training Sword"
++  type: WEAPON
++  roomDesc: "Training Sword"
++  keywords: ["sword", "training", "iron"]
++  description: "A hefty iron blade. Not the sharpest sword in the world but it will get the job done."
++  metadata:
++    quality: rare
++    slot: "wield"
++    itemLevel: 10
++    level: 5
++    minDamage: 11
++    maxDamage: 20
++    speed: 2.8
++    stats:
++      strength: 2
++      stamina: 2
++      critical: -1
++    sellable:
++      value: 30
++      currency: gold
++- id: leathervest
++  name: "Leather Vest"
++  type: ARMOR
++  roomDesc: "Leather Vest"
++  keywords: ["leather", "vest"]
++  description: "A plain leather vest. Better than nothing."
++  metadata:
++    quality: common
++    slot: "chest"
++    level: 1
++    itemLevel: 1
++    stats:
++      armor: 20
++    sellable:
++      value: 30
++      currency: gold
++- id: potionhealth1
++  name: "Potion of Health I"
++  roomDesc: "Potion of Health I"
++  keywords: [ "potion", "health" ]
++  type: POTION
++  metadata:
++    level: 1
++    # usable has two variants: spell, and effect
++    usable:
++      # this is the spell variant, you specify a skill of type SPELL
++      spell: "potion"
++      # charges/destroyOnDepleted lets you create consumable items
++      # without specifying charges the item can be used forever
++      charges: 5
++      destroyOnDepleted: true
++      # cooldown before item can be used again
++      cooldown: 30
++      # spell configuration, spell can access it via this.options
++      options:
++        restores: 30
++        stat: "health"
++- id: potionstrength1
++  name: "Potion of Strength I"
++  roomDesc: "Potion of Strength I"
++  keywords: [ "potion", "strength" ]
++  type: POTION
++  metadata:
++    level: 1
++    usable:
++      # this is the effect variant, you specify an effect name instead of a spell
++      effect: "potion.buff"
++      charges: 2
++      destroyOnDepleted: true
++      # effect config, see Effect docs. `name` is auto-populated with the item name
++      config:
++        description: "Increases strength by <b>10</b> for <b>15</b> seconds"
++        duration: 15000
++      # effect state, see Effect docs
++      state:
++        magnitude: 10
++        stat: "strength"
++- id: bladeofranvier
++  name: "Blade of Ranvier"
++  type: WEAPON
++  roomDesc: "Blade of Ranvier"
++  keywords: ["sword", "blade", "ranvier"]
++  description: "The blade shines a brilliant silver. Holding it you feel as if you could take on the world."
++  script: "ranvier-blade"
++  metadata:
++    quality: epic
++    slot: "wield"
++    itemLevel: 15
++    level: 10
++    minDamage: 13
++    maxDamage: 26
++    speed: 2.8
++    specialEffects:
++      - "Chance on hit: Blade of Ranvier thirsts for blood and heals the wielder for 25% of damage done."
++    stats:
++      strength: 2
++      stamina: 2
++      critical: 3
++- id: woodenshield
++  name: "Wooden Shield"
++  type: ARMOR
++  roomDesc: "Wooden Shield"
++  keywords: ["shield", "wooden"]
++  description: "A rather uninteresting looking wooden shield. A rusted metal band barely hold its together and the leather arm band is nearly torn."
++  metadata:
++    quality: common
++    slot: "shield"
++    level: 1
++    itemLevel: 1
++    stats:
++      armor: 10
++    sellable:
++      value: 30
++      currency: gold
++- id: test_key
++  name: "Oddly-shaped Key"
++  keywords: ["key", "odd", "oddly", "shaped"]
++  roomDesc: "A strange looking key"
++  description: "This key seems overly complex with numerous grooves."
++  metadata:
++    quality: common
++- id: locked_chest
++  type: CONTAINER
++  name: "Locked Chest"
++  roomDesc: "A wooden chest rests open in the corner, its hinges badly rusted."
++  keywords: [ "locked", "wooden", "chest" ]
++  items: [ "limbo:rustysword" ]
++  closed: true
++  locked: true
++  lockedBy: "limbo:test_key"
++  maxItems: 5
++  metadata:
++    noPickup: true
+diff --git a/bundles/ourtown-areas/areas/townhall/loot-pools.yml b/bundles/ourtown-areas/areas/townhall/loot-pools.yml
+new file mode 100644
+index 0000000..a4302b9
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/loot-pools.yml
+@@ -0,0 +1,6 @@
++---
++potions:
++  - "limbo:potionhealth1": 10
++  - "limbo:potionstrength1": 5
++junk:
++  - "limbo:scraps": 50
+diff --git a/bundles/ourtown-areas/areas/townhall/manifest.yml b/bundles/ourtown-areas/areas/townhall/manifest.yml
+new file mode 100644
+index 0000000..101d0fe
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/manifest.yml
+@@ -0,0 +1,4 @@
++title: "Limbo"
++behaviors:
++  progressive-respawn:
++    interval: 20
+diff --git a/bundles/ourtown-areas/areas/townhall/npcs.yml b/bundles/ourtown-areas/areas/townhall/npcs.yml
+new file mode 100644
+index 0000000..42b68c6
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/npcs.yml
+@@ -0,0 +1,135 @@
++- id: rat
++  keywords: ['rat']
++  name: A Rat
++  level: 2
++  description: "The rat's beady red eyes dart frantically, its mouth foaming as it scampers about."
++  script: 'rat'
++  items: ['limbo:sliceofcheese']
++  quests: ['limbo:onecheeseplease']
++  behaviors:
++    combat: true
++    ranvier-wander:
++      interval: 20
++      restrictTo: ['limbo:white', 'limbo:black', 'limbo:training1']
++  attributes:
++    health: 100
++    energy: 100
++- id: wiseoldman
++  keywords: ["wise", "old", "man"]
++  name: "Wise Old Man"
++  level: 99
++  script: 'old-man'
++  description: "A wise looking old man sits on the ground with legs crossed."
++- id: puppy
++  keywords: ["puppy", "dog", "loyal", "wide", "eyed", "wide-eyed"]
++  name: A Puppy
++  description: "A wide-eyed puppy stares up at you."
++  level: 1
++  script: 'puppy'
++- id: trainingdummy
++  keywords: ["dummy", "target", "practice"]
++  level: 2
++  name: "Training Dummy"
++  attributes:
++    health: 100
++    strength: 10
++  behaviors:
++    combat: true
++    lootable:
++      # currencies is a list of currencies this npc can possibly drop and the amount range
++      # the currency key is arbitrary so if you want a new currency just add a new key
++      # the key must be formatted_like_this though, for rendering/saving purposes
++      currencies:
++        gold:
++          min: 10
++          max: 20
++      # pools is a list of either a `"itemEntityReference": dropChance` or a name of a loot pool entry
++      # defined in the loot-pools.yml. This lets you do things like having a 'global' loot pool that every
++      # npc in the area can drop
++      pools:
++        - "limbo:junk"
++        - "limbo:potions"
++        - "limbo:sliceofcheese": 25
++  description: >-
++    The training dummy is almost human shaped although slightly out of proportion. The material it's made of is hard to
++    discern; it seems to constantly change between metal, wood, cloth, and glass depending on the angle. There is a
++    large red and white bullseye painted on its chest. The dummy has no eyes and mindlessly meanders about the area.
++- id: bossdummy
++  keywords: ["boss", "target", "dummy", "practice"]
++  name: "Boss Training Dummy"
++  level: 5
++  description: >-
++    This dummy is significantly larger than the others. Bright red with a monstrous figure it lumbers around the area
++    with a great echoing stomp. Where the other target dummies have a bullseye this dummy has a yellow exclamation mark.
++  attributes:
++    health: 200
++    strength: 15
++  behaviors:
++    combat: true
++    lootable:
++      currencies:
++        gold:
++          min: 50
++          max: 100
++      pools:
++        - "limbo:potions"
++        - "limbo:trainingsword": 100
++        - "limbo:bladeofranvier": 5
++- id: wallythewonderful
++  keywords: ["wally", "wonderful", "shop", "vendor"]
++  name: "Wally the Wonderful"
++  description: >-
++    Moe's Shop has the best wares in town! Armor, weapons and potions, you name and we ... might have it!
++  level: 99
++  metadata:
++    vendor:
++      items:
++        "limbo:trainingsword":
++          cost: 30
++          currency: gold
++        "limbo:leathervest":
++          cost: 30
++          currency: gold
++        "limbo:woodenshield":
++          cost: 30
++          currency: gold
++        "limbo:potionhealth1":
++          cost: 100
++          currency: gold
++        "limbo:potionstrength1":
++          cost: 150
++          currency: gold
++        "limbo:bladeofranvier":
++          cost: 99999
++          currency: gold
++      enterMessage: "Step right up! Get your wares at Moe's Shop!"
++      leaveMessage: "Come back soon!"
++- id: aggro-player-test
++  keywords: ["test", "aggro", "dummy"]
++  level: 2
++  name: "Player-aggressive Training Dummy"
++  description: >-
++    This NPC is aggressive towards players but not other NPCs. Be careful.
++  attributes:
++    health: 120
++    strength: 12
++  behaviors:
++    combat: true
++    ranvier-aggro:
++      delay: 5
++- id: aggro-npc-test
++  keywords: ["test", "aggro", "dummy"]
++  level: 2
++  name: "Self-hating Training Dummy"
++  description: >-
++    This NPC is aggressive towards other NPCs but not to the player.
++  attributes:
++    health: 100
++    strength: 15
++  behaviors:
++    combat: true
++    ranvier-aggro:
++      delay: 5
++      towards:
++        players: false
++        npcs: ["limbo:aggro-npc-test"]
+diff --git a/bundles/ourtown-areas/areas/townhall/quests.yml b/bundles/ourtown-areas/areas/townhall/quests.yml
+new file mode 100644
+index 0000000..4830846
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/quests.yml
+@@ -0,0 +1,86 @@
++---
++- id: journeybegins
++  title: "A Journey Begins"
++  level: 1
++  autoComplete: true
++  description: |-
++    A voice whispers to you: Welcome to the world, young one. This is a dangerous and deadly place, you should arm yourself.
++     - Open the chest with '<white>open chest</white>'
++     - Use '<white>get sword chest</white>' and '<white>get vest chest</white>' to get some gear
++     - Equip it using '<white>wield sword</white>' and '<white>wear vest</white>'
++  completionMessage: |-
++    <b><cyan>Hint: You can use the '<white>tnl</white>' or '<white>level</white>' commands to see how much experience you need to level.</cyan></b>
++    <b><yellow>The rat looks like it is hungry, use '<white>quest list rat</white>' to see what aid you can offer. Use '<white>quest start rat 1</white>' to accept their task.</yellow></b>
++    <b><cyan>Hint: To move around the game type any of the exit names listed in <white>[Exits: ...]</white> when you use the '<white>look</white>' command.</cyan></b>
++  goals:
++    - type: FetchGoal
++      config:
++        title: Find a Weapon
++        count: 1
++        item: 'limbo:rustysword'
++    - type: FetchGoal
++      config:
++        title: Find Some Armor
++        count: 1
++        item: 'limbo:leathervest'
++    - type: EquipGoal
++      config:
++        title: Wield A Weapon
++        slot: wield
++    - type: EquipGoal
++      config:
++        title: Equip Some Armor
++        slot: chest
++  rewards:
++    - type: ExperienceReward
++      config:
++        amount: 5
++        leveledTo: QUEST
++    - type: CurrencyReward
++      config:
++        currency: gold
++        amount: 10
++- id: onecheeseplease
++  title: One Cheese Please
++  level: 1
++  repeatable: true
++  description: |-
++    A rat's squeaks seem to indicate it wants some cheese. You check around the area, maybe someone has left some lying around.
++    
++    Once you find some bring it back to the rat, use '<white>quest log</white>' to find the quest number, then complete the quest with '<white>quest complete #</white>'
++  completionMessage: |-
++    <b><cyan>Hint: NPCs with quests available have <white>[</white><yellow>!</yellow><white>]</white> in front of their name, <white>[</white><yellow>?</yellow><white>]</white> means you have a quest ready to turn in, and <white>[</white><yellow>%</yellow><white>]</white> means you have a quest in progress.</cyan>
++  goals:
++    - type: FetchGoal
++      config:
++        title: Found Cheese
++        count: 1
++        item: 'limbo:sliceofcheese'
++        removeItem: true
++  rewards:
++    - type: ExperienceReward
++      config:
++        amount: 3
++        leveledTo: QUEST
++- id: selfdefense101
++  title: Self Defense 101
++  level: 2
++  requires: [ 'limbo:journeybegins' ]
++  autoComplete: true
++  description: |-
++    A voice whispers to you: It would be wise to practice protecting yourself. There are a number of training dummies in this area that, while not pushovers, will not be too difficult.
++    - Use '<white>attack dummy</white>' to start combat against the training dummy
++    - Once it's dead any loot it drops will be in its corpse on the ground. You can use '<white>look in corpse</white>' to check again or '<white>loot corpse</white>' to retrieve all your loot.
++  completionMessage: |-
++    <b><cyan>Hint: You can get the loot from enemies with '<white>get <item> corpse</white>' but be quick about it, the corpse will decay after some time.</cyan>
++  goals:
++    - type: KillGoal
++      config:
++        title: Kill a Training Dummy
++        npc: 'limbo:trainingdummy'
++        count: 1
++  rewards:
++    - type: ExperienceReward
++      config:
++        amount: 5
++        leveledTo: QUEST
+diff --git a/bundles/ourtown-areas/areas/townhall/rooms.yml b/bundles/ourtown-areas/areas/townhall/rooms.yml
+new file mode 100644
+index 0000000..da61f04
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/rooms.yml
+@@ -0,0 +1,160 @@
++- id: pit
++  title: "Pit of Despair"
++  description: "A small, square stone room with no windows and only one door. A single torch provides meager illumination. However, there is not much to see."
++  items:
++    - id: "townhall:goldrock"
++      respawnChance: 100
++      replaceOnRespawn: true # when this chest respawns completely replace it so its contents get refreshed
++  
++  
++- id: black
++  title: "Black Room"
++  description: >-
++    A completely black room. Somehow all of the light that should be coming from the room to the west does not pass
++    through the archway. A single lightbulb hangs from the ceiling illuminating a small area. To the east you see a
++    large white dome. There is a sign above the entrance to the dome: "Training Area"
++  script: "black"
++  items:
++    - id: "limbo:sliceofcheese"
++      respawnChance: 10
++  npcs: ["limbo:wiseoldman", "limbo:puppy"]
++  exits:
++    - roomId: "limbo:white"
++      direction: west
++      leaveMessage: " steps into the light and disappears."
++    - roomId: "limbo:training1"
++      direction: east
++- &trainingroom
++  id: training1
++  title: "Training Room"
++  script: "combat-training"
++  description: >-
++    The entire area is covered by a large dome with a hexagonal grid surface. A beautiful blue sky reaches from horizon
++    to horizon, punctuated by the lines of the grid. The dome shimmers as virtual birds fly into and out of its surface.
++    The pure green grass is eerily undisturbed by you walking over it or by the simulated breeze.
++  npcs:
++    - id: "limbo:trainingdummy"
++      respawnChance: 25
++      maxLoad: 3
++  exits:
++    - roomId: "limbo:black"
++      direction: west
++    - roomId: "limbo:training2"
++      direction: north
++    - roomId: "limbo:training4"
++      direction: east
++- <<: *trainingroom
++  id: training2
++  title: "Training Room 2"
++  items:
++    - id: "craft:greenplant"
++      respawnChance: 30
++  npcs:
++    - id: "limbo:trainingdummy"
++      respawnChance: 25
++      maxLoad: 3
++    - id: "limbo:aggro-player-test"
++      respawnChance: 25
++      maxLoad: 1
++  exits:
++    - roomId: "limbo:training1"
++      direction: south
++    - roomId: "limbo:training3"
++      direction: east
++- <<: *trainingroom
++  id: training3
++  title: "Training Room 3"
++  items:
++    - id: "craft:redrose"
++      respawnChance: 15
++  exits:
++    - roomId: "limbo:training2"
++      direction: west
++    - roomId: "limbo:training4"
++      direction: south
++    - roomId: "limbo:bosstraining"
++      direction: north
++- <<: *trainingroom
++  id: training4
++  title: "Training Room 4"
++  npcs:
++    - id: "limbo:trainingdummy"
++      respawnChance: 25
++      maxLoad: 3
++    - id: "limbo:aggro-npc-test"
++      respawnChance: 50
++      maxLoad: 2
++  exits:
++    - roomId: "limbo:training1"
++      direction: west
++    - roomId: "limbo:training3"
++      direction: north
++- id: bosstraining
++  title: "Boss Training Room"
++  description: >-
++    The dome in this section is bright red, the pure green grass is replaced with a smooth white surface. The ground
++    beneath your feet has the word "Danger" in bright red letters tiled across the area.
++  npcs:
++    - id: "limbo:bossdummy"
++      respawnChance: 50
++  exits:
++    - roomId: "limbo:training3"
++      direction: south
++- id: ancientwayshrine
++  title: "Ancient Wayshrine"
++  description: >
++    A runed black obelisk towers in the center of this clearing, surrounded by a faerie ring. The runes pulse and glow with
++    a soft blue light. The grass immediately around the obelisk is immaculate in stark contrast to the dying former meadow
++    that makes up the clearing.
++  script: 'ancientwayshrine'
++  exits:
++    - roomId: "limbo:white"
++      direction: up
++    - roomId: "limbo:context"
++      direction: down
++- id: wallys
++  title: "Wally's Wonderful Wares (Shop)"
++  description: >- 
++    A very brightly colored shop stall stands in the middle of an otherwise desolate clearing. The stall is covered in
++    colorful cloth, shining gems, and battle gear of all varieties. A large sign sits next to the products:
++    "<b><yellow>Wally's Wonderful Wares</yellow></b> has the best products in town! Armor, weapons and potions, you name
++    and we... might have it!"
++  npcs:
++    - id: "limbo:wallythewonderful"
++      respawnChance: 0
++  exits:
++    - roomId: "limbo:white"
++      direction: east
++- id: context
++  title: "Room Context Commands Test"
++  script: 'context'
++  description: >-
++    This room shows off commands that are only active in a particular room. Try out the <b><cyan>roomtest</cyan></b> command.
++  metadata:
++    commands: [ 'roomtest' ]
++  items:
++    - id: "limbo:test_key"
++  exits:
++    - roomId: "limbo:ancientwayshrine"
++      direction: up
++    - roomId: "limbo:locked"
++      direction: east
++  doors:
++    "limbo:ancientwayshrine":
++      locked: true
++      closed: true
++- id: locked
++  title: "Locked room with key"
++  description: This room requires a key to get into
++  items:
++    - id: "limbo:locked_chest"
++      respawnChance: 5
++      replaceOnRespawn: true
++  exits:
++    - roomId: "limbo:context"
++      direction: west
++  doors:
++    "limbo:context":
++      lockedBy: "limbo:test_key"
++      locked: true
++      closed: true
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/items/ranvier-blade.js b/bundles/ourtown-areas/areas/townhall/scripts/items/ranvier-blade.js
+new file mode 100644
+index 0000000..bcc51f6
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/items/ranvier-blade.js
+@@ -0,0 +1,34 @@
++'use strict';
++
++const { Random } = require('rando-js');
++
++const { Broadcast, Heal } = require('ranvier');
++
++/**
++ * Example weapon hit script
++ */
++module.exports = {
++  listeners: {
++    hit: state => function (damage, target, finalAmount) {
++      if (!damage.attacker || damage.attacker.isNpc) {
++        return;
++      }
++
++      // Have to be careful in weapon scripts. If you have a weapon script that causes damage and
++      // it listens for the 'hit' event you will have to check to make sure that `damage.source
++      // !== this` otherwise you could create an infinite loop the weapon's own damage triggering
++      // its script
++
++      if (Random.probability(50)) {
++        const amount = damage.metadata.critical ?
++          damage.attacker.getMaxAttribute('health') :
++          Math.floor(finalAmount / 4);
++
++        const heal = new Heal('health', amount, damage.attacker, this);
++
++        Broadcast.sayAt(damage.attacker, `<b><white>The Blade of Ranvier shines with a bright white light and you see wisps of ${target.name}'s soul flow into the blade.</white></b>`, 80);
++        heal.commit(damage.attacker);
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/npcs/old-man.js b/bundles/ourtown-areas/areas/townhall/scripts/npcs/old-man.js
+new file mode 100644
+index 0000000..7ef5a1b
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/npcs/old-man.js
+@@ -0,0 +1,30 @@
++'use strict';
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      if (this.hasEffectType('speaking')) {
++        return;
++      }
++
++      const speak = state.EffectFactory.create('speak', {}, {
++        messageList: [
++          "Welcome, %player%. The combat training area lies to the east.",
++          "To the west lies Wally's shop where you can stock up on potions.",
++        ],
++        outputFn: message => {
++          message = message.replace(/%player%/, player.name);
++          state.ChannelManager.get('say').send(state, this, message);
++        }
++      });
++      this.addEffect(speak);
++    },
++
++    playerLeave: state => function (player) {
++      const speaking = this.effects.getByType('speaking');
++      if (speaking) {
++        speaking.remove();
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/npcs/puppy.js b/bundles/ourtown-areas/areas/townhall/scripts/npcs/puppy.js
+new file mode 100644
+index 0000000..2d36841
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/npcs/puppy.js
+@@ -0,0 +1,16 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      if (this.following) {
++        return;
++      }
++
++      Broadcast.sayAt(player, 'The puppy lets out a happy bark and runs to your side.');
++      this.follow(player);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/npcs/rat.js b/bundles/ourtown-areas/areas/townhall/scripts/npcs/rat.js
+new file mode 100644
+index 0000000..714c49d
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/npcs/rat.js
+@@ -0,0 +1,35 @@
++'use strict';
++
++const { Broadcast, Logger } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    spawn: state => function () {
++      Broadcast.sayAt(this.room, "A rat scurries into view.");
++      Logger.log(`Spawned rat into Room [${this.room.title}]`);
++    },
++
++    /**
++     * Rat tries to use Rend every time it's available
++     */
++    updateTick: state => function () {
++      if (!this.isInCombat()) {
++        return;
++      }
++
++      const target = [...this.combatants][0];
++
++      const rend = state.SkillManager.get('rend');
++      // skills do both of these checks internally but I only want to send
++      // this message when execute would definitely succeed
++      if (!rend.onCooldown(this) && rend.hasEnoughResources(this)) {
++        Broadcast.sayAt(target, "The rat bears its fangs and leaps at your throat!");
++        rend.execute(null, this, target);
++      }
++    },
++
++    deathblow: state => function (player) {
++      Broadcast.sayAt(player.room, `The rat seems to snicker evilly as ${player.name} drops dead from their wounds.`);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/rooms/ancientwayshrine.js b/bundles/ourtown-areas/areas/townhall/scripts/rooms/ancientwayshrine.js
+new file mode 100644
+index 0000000..cf0df1c
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/rooms/ancientwayshrine.js
+@@ -0,0 +1,24 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    channelReceive: state => function (channel, sender, message) {
++      if (channel.name !== 'say') {
++        return;
++      }
++
++      if (!message.toLowerCase().match('mellon')) {
++        return;
++      }
++
++      const downExit = this.getExits().find(exit => exit.direction === 'down');
++      const downRoom = state.RoomManager.getRoom(downExit.roomId);
++
++      Broadcast.sayAt(sender, "You have spoken 'friend', you may enter. The trap door opens with a *click*");
++      downRoom.unlockDoor(this);
++      downRoom.openDoor(this);
++    },
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/rooms/black.js b/bundles/ourtown-areas/areas/townhall/scripts/rooms/black.js
+new file mode 100644
+index 0000000..8831385
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/rooms/black.js
+@@ -0,0 +1,12 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      Broadcast.sayAt(player);
++      Broadcast.sayAt(player, `<b><cyan>Hint: You can pick up items from the room listed in '<white>look</white>' with '<white>get</white>' followed by a reasonable keyword for the item e.g., '<white>get cheese</white>'. Some items, like the chest, may contain items; you can check by looking at the item.</cyan></b>`, 80);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/rooms/combat-training.js b/bundles/ourtown-areas/areas/townhall/scripts/rooms/combat-training.js
+new file mode 100644
+index 0000000..5a4ba6e
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/rooms/combat-training.js
+@@ -0,0 +1,13 @@
++'use strict';
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      const questRef = 'limbo:selfdefense101';
++      if (state.QuestFactory.canStart(player, questRef)) {
++        const quest = state.QuestFactory.create(state, questRef, player);
++        player.questTracker.start(quest);
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/rooms/context.js b/bundles/ourtown-areas/areas/townhall/scripts/rooms/context.js
+new file mode 100644
+index 0000000..17a881e
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/rooms/context.js
+@@ -0,0 +1,11 @@
++'use strict';
++
++const { Broadcast } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    command: state => function (player, commandName, args) {
++      Broadcast.sayAt(player, `You just executed room context command '${commandName}' with arguments ${args}`);
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/areas/townhall/scripts/rooms/white.js b/bundles/ourtown-areas/areas/townhall/scripts/rooms/white.js
+new file mode 100644
+index 0000000..a9bd723
+--- /dev/null
++++ b/bundles/ourtown-areas/areas/townhall/scripts/rooms/white.js
+@@ -0,0 +1,13 @@
++'use strict';
++
++module.exports = {
++  listeners: {
++    playerEnter: state => function (player) {
++      const questRef = 'limbo:journeybegins';
++      if (state.QuestFactory.canStart(player, questRef)) {
++        const quest = state.QuestFactory.create(state, questRef, player);
++        player.questTracker.start(quest);
++      }
++    }
++  }
++};
+diff --git a/bundles/ourtown-areas/behaviors/npc/test.js b/bundles/ourtown-areas/behaviors/npc/test.js
+new file mode 100644
+index 0000000..da9c7a6
+--- /dev/null
++++ b/bundles/ourtown-areas/behaviors/npc/test.js
+@@ -0,0 +1,39 @@
++'use strict';
++
++const { Logger } = require('ranvier');
++
++module.exports = {
++  listeners: {
++    spawn: state => function () {
++      Logger.log(`${this.name} spawned into room ${this.room.title}`);
++    },
++
++    playerEnter: state => function (player) {
++      Logger.log(`${this.name} noticed ${player.name} enter room`);
++    },
++
++    playerLeave: state => function (target, destination) {
++      Logger.log(`${target.name} left ${this.room.title} towards ${destination.title}`);
++    },
++
++    playerDropItem: state => function(player, item) {
++      Logger.log(`${this.name} noticed ${player.name} dropped ${item.name}`);
++    },
++
++    hit: state => function(target, amount) {
++      Logger.log(`${this.name} hit ${target.name} for ${amount}`);
++    },
++
++    damaged: state => function (amount) {
++      Logger.log(`${this.name} damaged ${amount}`);
++    },
++
++    npcLeave: state => function (target, destination) {
++      Logger.log(`${target.name} left ${this.room.title} towards ${destination.title}`);
++    },
++
++    npcEnter: state => function (target) {
++      Logger.log(`${target.name} entered same room as ${this.name}`);
++    },
++  }
++};
+diff --git a/bundles/ourtown-areas/package-lock.json b/bundles/ourtown-areas/package-lock.json
+new file mode 100644
+index 0000000..2b284c0
+--- /dev/null
++++ b/bundles/ourtown-areas/package-lock.json
+@@ -0,0 +1,13 @@
++{
++  "name": "bundle-example-areas",
++  "version": "1.0.0",
++  "lockfileVersion": 1,
++  "requires": true,
++  "dependencies": {
++    "rando-js": {
++      "version": "0.2.0",
++      "resolved": "https://registry.npmjs.org/rando-js/-/rando-js-0.2.0.tgz",
++      "integrity": "sha512-ma6MiyEDVEV0w9FYVQeshGkXkHcHqwPPLqrh32XnqtbQwXQ1TGUqs+bFlRLQ++JZ/KlyOuZ/CIqIXGP9CTvOyQ=="
++    }
++  }
++}
+diff --git a/bundles/ourtown-areas/package.json b/bundles/ourtown-areas/package.json
+new file mode 100644
+index 0000000..e7e6ba0
+--- /dev/null
++++ b/bundles/ourtown-areas/package.json
+@@ -0,0 +1,15 @@
++{
++  "private": true,
++  "name": "bundle-example-areas",
++  "version": "1.0.0",
++  "description": "Example Ranvier areas",
++  "repository": {
++    "type": "git",
++    "url": "git+https://github.com/RanvierMUD/bundle-example-areas.git"
++  },
++  "author": "Shawn Biddle <shawncplus@gmail.com>",
++  "license": "MIT",
++  "dependencies": {
++    "rando-js": "^0.2.0"
++  }
++}
+diff --git a/data/account/Admin.json b/data/account/Admin.json
+deleted file mode 100644
+index 4b6a2ac..0000000
+--- a/data/account/Admin.json
++++ /dev/null
+@@ -1,13 +0,0 @@
+-{
+-  "username": "Admin",
+-  "characters": [
+-    {
+-      "username": "Admin",
+-      "deleted": false
+-    }
+-  ],
+-  "password": "$2a$10$kE4d5oRcQOCksbKHur7nbezcGD6gUil/cqkwhGagfM1u4WfhDjR8.",
+-  "banned": false,
+-  "deleted": false,
+-  "metadata": {}
+-}
+\ No newline at end of file
+diff --git a/data/account/Admin.json.sav b/data/account/Admin.json.sav
+new file mode 100644
+index 0000000..4b6a2ac
+--- /dev/null
++++ b/data/account/Admin.json.sav
+@@ -0,0 +1,13 @@
++{
++  "username": "Admin",
++  "characters": [
++    {
++      "username": "Admin",
++      "deleted": false
++    }
++  ],
++  "password": "$2a$10$kE4d5oRcQOCksbKHur7nbezcGD6gUil/cqkwhGagfM1u4WfhDjR8.",
++  "banned": false,
++  "deleted": false,
++  "metadata": {}
++}
+\ No newline at end of file
+diff --git a/ranvier.json b/ranvier.json
+index 6554fa9..f1909c5 100644
+--- a/ranvier.json
++++ b/ranvier.json
+@@ -1,7 +1,7 @@
+ {
+   "port": 4000,
+   "bundles": [
+-    "bundle-example-areas",
++	"ourtown-areas",
+     "bundle-example-channels",
+     "bundle-example-classes",
+     "bundle-example-combat",
+@@ -90,7 +90,7 @@
+   "minPlayerNameLength": 3,
+   "maxCharacters": 3,
+   "reportToAdmins": false,
+-  "startingRoom": "limbo:white",
++  "startingRoom": "townhall:pit",
+   "moveCommand": "move",
+   "skillLag": 2000,
+   "defaultMaxPlayerInventory": 16,

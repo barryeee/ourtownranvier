@@ -1,4 +1,24 @@
 - id: townsquare
-  title: "Town Square"
+  title: Town Square
+  coordinates: [0, 0, 0]
   description: "You are located in the heart of Our Town, surrounded by the Town Hall, the High Cathedral, and a dry goods store which specializes in outfitting people for the crazy adventures which some groups embark upon around here. The local tavern/hotel, where visitors can find a room for the night, also borders on the Square. Main Street runs north and south from the square, while Broadway runs east and west."
   
+- id: nmain1
+  title: North Main Street
+  coordinates: [0,1,0]
+  description: "A well-paved street on the north end of Main Street. To the north is the North Bridge and the open road! To the West is Town Hall and to the east is the High Cathedral. South leads to Town Square."
+ 
+- id: nbridge
+  title: North Bridge
+  coordinates: [0,2,0]
+  description: "A rickety, wooden bridge leading over the Volta River. It is barely wide enough for one person use. The bridge is closed for repairs. The next person who tires to cross will likely fall into the river and drown. At least, that's what happened to the last person that tried to use the bridge."
+
+- id: smain1
+  title: South Main Street
+  coordinates: [0,-1,0]
+  description: "This is south extenstion of Main Street. To the West is Ollie's Outfitters, to the East is the Seven Sorrows Inn and to the South is the South Gate, the southern exit of Our Town."
+ 
+- id: southgate
+  title: South Gate
+  coordinates: [0,-2,0]
+  description: "The southern entrance/exit to Our Town.  There is a beautiful golden gate here."
